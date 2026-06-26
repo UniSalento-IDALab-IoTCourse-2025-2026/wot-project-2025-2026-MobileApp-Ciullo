@@ -1,50 +1,40 @@
-# SMARTCARE — App GPS Android
+# SMARTCARE — App Smartphone (GPS)
 
-App mobile React Native (Expo) per il tracking GPS del paziente.
-Invia la posizione al backend ogni 10 secondi e mostra la dashboard vitali.
+## Descrizione del progetto
+SMARTCARE è un sistema intelligente EDGE per la raccolta di parametri biomedici
+e il rilevamento di anomalie in pazienti affetti da scompenso cardiaco.
+Il sistema acquisisce segnali biomedici reali tramite macchinario IIT,
+esegue anomaly detection in edge su Raspberry Pi con Isolation Forest,
+e notifica automaticamente il medico e il hub del pronto soccorso
+in caso di eventi critici, includendo la posizione GPS del paziente.
 
-## Stack tecnologico
+## Architettura del sistema
+1. **Macchinario IIT + Dongle** — acquisisce segnali biomedici reali via BLE
+2. **Raspberry Pi (edge node)** — anomaly detection con Isolation Forest
+3. **App smartphone** — risponde con posizione GPS su richiesta del Raspberry
+4. **Backend** — MQTT, MongoDB, REST API, alert engine
+5. **Dashboard paziente + Dashboard medico** — due web app React separate
 
-- **Expo SDK 54** — framework React Native
-- **expo-location** — accesso GPS del dispositivo
-- **Axios** — chiamate REST API al backend
+## Repository delle componenti
+| Componente | Repository |
+|---|---|
+| Raspberry Pi (edge node) | [wot-project-2025-2026-RaspberryPi-Ciullo](https://github.com/UniSalento-IDALab-IoTCourse-2025-2026/wot-project-2025-2026-RaspberryPi-Ciullo) |
+| App Mobile (GPS) | questo repository |
+| Backend | [wot-project-2025-2026-Backend-Ciullo](https://github.com/UniSalento-IDALab-IoTCourse-2025-2026/wot-project-2025-2026-Backend-Ciullo) |
+| Dashboard | [wot-project-2025-2026-Dashboard-Ciullo](https://github.com/UniSalento-IDALab-IoTCourse-2025-2026/wot-project-2025-2026-Dashboard-Ciullo) |
+| Presentazione | [wot-project-2025-2026-Presentation-Ciullo](https://github.com/UniSalento-IDALab-IoTCourse-2025-2026/wot-project-2025-2026-Presentation-Ciullo) |
 
-## Funzionalità
+## Questa componente — App Smartphone
+App React Native minimale che espone un endpoint HTTP locale.
+Quando il Raspberry Pi rileva un'anomalia, invia una richiesta HTTP
+all'app che risponde con le coordinate GPS del paziente.
 
-- Acquisizione posizione GPS ad alta precisione ogni 10 secondi
-- Invio coordinate al backend tramite REST API autenticata con JWT
-- Dashboard vitali in tempo reale (BPM, HRV, Temperatura, Anomaly score)
-- Attività giornaliera (passi, distanza, calorie)
-- Storico BPM con grafico a barre
-- Lista alert recenti (warning e critical)
+### Funzionalità
+- Endpoint HTTP che risponde con latitudine e longitudine
+- Acquisizione GPS tramite expo-location
+- Attivata solo su richiesta, non in background continuo
 
-## Setup
-
-```bash
-# Installa dipendenze
-npm install
-
-# Avvia con Expo
-npx expo start
-```
-
-Poi scansiona il QR code con **Expo Go** (SDK 54) dal Play Store.
-
-## Configurazione (App.js)
-
-```javascript
-const BACKEND_URL = 'http://192.168.0.104:3000'  // IP del PC con backend
-const PATIENT_ID  = 'PAZ-001'                     // ID del paziente
-const TOKEN       = 'jwt_token_del_paziente'       // Token JWT dal login
-const INTERVAL_MS = 10000                          // Intervallo invio GPS (ms)
-```
-
-## Permessi richiesti
-
-- **Localizzazione** — per accedere al GPS del dispositivo
-
-## Note
-
-- L'app e il backend devono essere sulla stessa rete WiFi
-- Il token JWT va aggiornato ogni 7 giorni (durata token)
-- Expo Go deve essere versione SDK 54 per compatibilità
+### Tecnologie utilizzate
+- Framework: React Native + Expo
+- GPS: expo-location
+- Comunicazione: HTTP server locale
